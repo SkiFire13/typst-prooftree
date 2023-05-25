@@ -188,7 +188,7 @@
       final_width - right_label_width_offset
     )
     let wleft = (new_left_space + root_offset) - label_wleft
-    let wright = right_label_width_offset - (new_left_space + root_offset + width(root))
+    let wright = width(body) - new_left_space - root_offset - width(root) - label_wright
 
     (
       body: body,
