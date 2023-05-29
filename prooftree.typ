@@ -73,7 +73,7 @@
         // Labels stack on top of axioms
         stack(
           dir: ttb,
-          spacing: 1.5 * vspacing,
+          spacing: 1.5 * settings.vspacing,
           align(center, label),
           root
         )
