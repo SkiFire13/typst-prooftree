@@ -59,5 +59,5 @@
 
     rule(n: 3, label: "E-S", $El_N1(w_1, id(*)) in Id(N1, w_1, *) [w_1 in N1, w_2 in N1]$),
 
-  rule(n: 3, label: "E-S", $El_N1(w_2, El_N1(w_1, id(*)) in Id(N1, w_1, w_2) [w_1 in N1, w_2 in N1]$),
+  rule(n: 3, label: "E-S", $El_N1(w_2, El_N1(w_1, id(*))) in Id(N1, w_1, w_2) [w_1 in N1, w_2 in N1]$),
 )
