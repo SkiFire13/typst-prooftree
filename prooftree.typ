@@ -5,6 +5,7 @@
     lateral: 0.5em,
   ),
   label: (
+    // TODO: split offset into horizontal and vertical
     offset: -0.1em,
     side: left,
   ),
@@ -122,7 +123,7 @@
 #let axiom(label: none, body) = {
   // Check the type of `label`.
   assert(
-    type(label) == "string",
+    type(label) == "string" or type(label) == "none",
     message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
      + "`string` but was instead `" + type(label) + "`."
   )
@@ -176,12 +177,12 @@
 
   // Check the type of `label`.
   assert(
-    type(label) == "string" or type(label) == "dictionary",
+    type(label) in ("string", "dictionary", "none"),
     message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
      + "`string` or `dictionary` but was instead `" + type(label) + "`."
   )
   // If the type of `label` was string then it's good, otherwise we need to check its keys.
-  if type(label) != "string" {
+  if type(label) == "dictionary" {
     for (key, value) in label {
       // TODO: maybe consider allowing `top`, `top-left` and `top-right` if `rule(n: 0)` gets changed.
       if key not in ("left", "right") {
@@ -283,12 +284,22 @@
 
       // Normalize label given the default value in the `prooftree` function.
       let label = label
+      if type(label) == "none" {
+        label = (
+          left: none,
+          right: none
+        )
+      }
       if type(label) == "string" {
         label = (
           left: if settings.label.side == left { label } else { none },
           right: if settings.label.side == right { label } else { none }
         )
       }
+      label = (
+        left: label.at("left", default: none),
+        right: label.at("right", default: none),
+      )
 
       // Pad the labels to separate them from the rule
       let left_label = box(inset: (right: 0.2em), label.left)
