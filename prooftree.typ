@@ -10,13 +10,27 @@
   ),
   ..rules
 ) = {
+  assert(
+    type(spacing) == "dictionary",
+    message: "The value `" + repr(spacing) + "of the `spacing` argument was expected"
+      + "to have type `dictionary` but instead had type `" + type(spacing) + "`."
+  )
+  assert(
+    type(label) == "dictionary",
+    message: "The value `" + repr(label) + "of the `label` argument was expected"
+      + "to have type `dictionary` but instead had type `" + type(label) + "`."
+  )
+
   // Check validity of spacing keys
   for (key, value) in spacing {
     if key not in ("horizontal", "vertical", "lateral", "h", "v", "l") {
-      panic("Key " + key + " in spacing argument was not expected")
+      panic("The key `" + key + "` in the `spacing` argument `" + repr(spacing) + "` was not expected.")
     }
     if type(value) != "length" {
-      panic("Value " + repr(value) + " was expected to have type length but instead had type + " + type(value))
+      panic(
+        "The value `" + repr(value) + "` of the key `" + key + "` in the `spacing` argument `" + repr(spacing)
+        + "` was expected to have type `length` but instead had type `" + type(value) + "`."
+      )
     }
   }
 
@@ -24,7 +38,8 @@
   let mutually_exclusive(key1, key2, keys) = {
     assert(
       key1 not in keys or key2 not in keys,
-      message: key1 + " and " + key2 + " keys in the spacing argument are mutually exclusive"
+      message: "The keys `" + key1 + "` and `" + key2 + "` in the `spacing` argument `"
+        + repr(spacing) + "` are mutually exclusive."
     )
   }
   mutually_exclusive("horizontal", "h", spacing.keys())
@@ -35,36 +50,50 @@
   let expected = ("offset": "length", "side": "alignment")
   for (key, value) in label {
     if key not in expected {
-      panic("Key " + key + " in label argument was not expected")
+      panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
     }
     if type(value) != expected.at(key) {
-      panic("Value " + repr(value) + " was expected to have type " + type.at(key) + " byt instead had type " + type(value))
+      panic(
+        "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
+        + "` was expected to have type `" + type.at(key) + "` but instead had type `" + type(value) + "`."
+      )
     }
   }
   assert(
     "side" not in label or label.side == left or label.side == right,
-    message: "The label side can only be left (default) or right"
+    message: "The value for the key `side` in the argument `label` can only be either "
+      + "`left` (default) or `right`, but instead was `" + repr(label.side) + "`."
+  )
+
+  // Check basic validity of rules
+  if rules.pos().len() == 0 {
+    panic("The `rules` argument cannot be empty.")
+  }
+
+  let settings = (
+    spacing: (
+      horizontal: spacing.at("horizontal", default: spacing.at("h", default: 1.5em)),
+      vertical: spacing.at("vertical", default: spacing.at("v", default: 0.5em)),
+      lateral: spacing.at("lateral", default: spacing.at("l", default: 0.5em)),
+    ),
+    label: (
+      offset: label.at("offset", default: -0.1em),
+      side: label.at("side", default: left),
+    ),
   )
 
   style(styles => {
     let stack = ()
-    let settings = (
-      spacing: (
-        horizontal: spacing.at("horizontal", default: spacing.at("h", default: 1.5em)),
-        vertical: spacing.at("vertical", default: spacing.at("v", default: 0.5em)),
-        lateral: spacing.at("lateral", default: spacing.at("l", default: 0.5em)),
-      ),
-      label: (
-        offset: label.at("offset", default: -0.1em),
-        side: label.at("side", default: left),
-      ),
-    )
 
     for rule in rules.pos() {
       let to_pop = rule.__prooftree_to_pop
       let rule_func = rule.__prooftree_rule_func
 
-      assert(to_pop <= stack.len(), message: "Not enough rules")
+      assert(
+        to_pop <= stack.len(),
+        message: "The rule `" + repr(rule.__prooftree_raw) + "` was expecting at least "
+          + to_pop + " rules in the stack, but only " + stack.len() + " were present."
+      )
 
       let elem = rule_func(
         settings,
@@ -76,7 +105,10 @@
       stack.push(elem)
     }
 
-    assert(stack.len() == 1, message: "Not all rules were consumed")
+    assert(
+      stack.len() == 1,
+      message: "Some rule remained unmatched: " + stack.len() + " roots were found but only 1 was expected."
+    )
 
     set align(start)
     set box(inset: 0pt, outset: 0pt)
@@ -86,8 +118,8 @@
 }
 
 #let rule(
-  n: 1, 
-  label: none, 
+  n: 1,
+  label: none,
   label-left: none,
   label-right: none,
   root
