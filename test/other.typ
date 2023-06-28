@@ -3,7 +3,7 @@
 #set text(font: "New Computer Modern", size: 12pt)
 
 #prooftree(
-  label-side: right,
+  label: (side: right),
   axiom("A1"),
   rule(label-left: "F-B", "B11111"),
   rule(label: "F-B", "B11"),

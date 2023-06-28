@@ -1,24 +1,63 @@
 #let prooftree(
-  hspacing: 1.5em,
-  pspacing: 0.5em,
-  vspacing: 0.5em,
-  label-offset: -0.1em,
-  label-side: left,
+  spacing: (
+    horizontal: 1.5em,
+    vertical: 0.5em,
+    lateral: 0.5em,
+  ),
+  label: (
+    offset: -0.1em,
+    side: left,
+  ),
   ..rules
 ) = {
+  // Check validity of spacing keys
+  for (key, value) in spacing {
+    if key not in ("horizontal", "vertical", "lateral", "h", "v", "l") {
+      panic("Key " + key + " in spacing argument was not expected")
+    }
+    if type(value) != "length" {
+      panic("Value " + repr(value) + " was expected to have type length but instead had type + " + type(value))
+    }
+  }
+
+  // Check exclusivity of spacing keys
+  let mutually_exclusive(key1, key2, keys) = {
+    assert(
+      key1 not in keys or key2 not in keys,
+      message: key1 + " and " + key2 + " keys in the spacing argument are mutually exclusive"
+    )
+  }
+  mutually_exclusive("horizontal", "h", spacing.keys())
+  mutually_exclusive("vertical", "v", spacing.keys())
+  mutually_exclusive("lateral", "l", spacing.keys())
+  
+  // Check validity of label keys
+  let expected = ("offset": "length", "side": "alignment")
+  for (key, value) in label {
+    if key not in expected {
+      panic("Key " + key + " in label argument was not expected")
+    }
+    if type(value) != expected.at(key) {
+      panic("Value " + repr(value) + " was expected to have type " + type.at(key) + " byt instead had type " + type(value))
+    }
+  }
   assert(
-    label-side == left or label-side == right, 
+    "side" not in label or label.side == left or label.side == right,
     message: "The label side can only be left (default) or right"
   )
 
   style(styles => {
     let stack = ()
     let settings = (
-      hspacing: hspacing,
-      pspacing: pspacing,
-      vspacing: vspacing,
-      label-offset: label-offset,
-      label-side: label-side,
+      spacing: (
+        horizontal: spacing.at("horizontal", default: spacing.at("h", default: 1.5em)),
+        vertical: spacing.at("vertical", default: spacing.at("v", default: 0.5em)),
+        lateral: spacing.at("lateral", default: spacing.at("l", default: 0.5em)),
+      ),
+      label: (
+        offset: label.at("offset", default: -0.1em),
+        side: label.at("side", default: left),
+      ),
     )
 
     for rule in rules.pos() {
@@ -65,7 +104,7 @@
     let gtl(l1, l2) = maxl(l1, l2) != l2
     let minl(l1, l2) = if gtl(l1, l2) { l2 } else { l1 }
     
-    let root = [ #h(settings.pspacing) #root #h(settings.pspacing) ]
+    let root = [ #h(settings.spacing.lateral) #root #h(settings.spacing.lateral) ]
 
     // Axiom case
     if n == 0 {
@@ -73,7 +112,7 @@
         // Labels stack on top of axioms
         stack(
           dir: ttb,
-          spacing: 1.5 * settings.vspacing,
+          spacing: 1.5 * settings.spacing.vertical,
           align(center, label),
           root
         )
@@ -91,7 +130,7 @@
     }
 
     // Map the children to a single block
-    let branches = children.map(c => box(c.body)).join(h(settings.hspacing))
+    let branches = children.map(c => box(c.body)).join(h(settings.spacing.horizontal))
 
     // Calculate the offsets of the "inner" branches, i.e. ignoring branches' labels
     let wbranches_nolabel = width(branches) - children.first().label_wleft - children.last().label_wright
@@ -130,15 +169,15 @@
     // This is needed later to calculate the sizes when placing the new labels.
     let body_nolabel = stack(
       dir: ttb,
-      spacing: settings.vspacing,
+      spacing: settings.spacing.vertical,
       box(inset: (left: branches_offset), branches),
       line(start: (line_start, 0pt), length: line_len),
       box(inset: (left: root_offset), root),
     )
 
     // Decide which label to use
-    let default_left_label = if settings.label-side == left { label } else { none }
-    let default_right_label = if settings.label-side == right { label } else { none }
+    let default_left_label = if settings.label.side == left { label } else { none }
+    let default_right_label = if settings.label.side == right { label } else { none }
     let left_label = if label-left != none { label-left } else { default_left_label }
     let right_label = if label-right != none { label-right } else { default_right_label }
 
@@ -167,14 +206,14 @@
       #place(
         bottom + left,
         dx: left_label_width_offset,
-        dy: settings.label-offset,
-        box(height: 2 * (height(root) + settings.vspacing), align(horizon, left_label))
+        dy: settings.label.offset,
+        box(height: 2 * (height(root) + settings.spacing.vertical), align(horizon, left_label))
       )
       #place(
         bottom + left,
         dx: right_label_width_offset,
-        dy: settings.label-offset,
-        box(height: 2 * (height(root) + settings.vspacing), align(horizon, right_label))
+        dy: settings.label.offset,
+        box(height: 2 * (height(root) + settings.spacing.vertical), align(horizon, right_label))
       )
     ]
 
