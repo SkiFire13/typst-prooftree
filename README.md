@@ -9,7 +9,7 @@ Feel free to open an issue or a pull request if you have a question or there's s
 Copy the [`prooftree.typ`](prooftree.typ) file to your project or add this repository as a submodule to yours. Then you just need:
 
 ```js
-#import "../prooftree.typ": *
+#import "path/to/prooftree.typ": *
 ```
 
 at the top of your current file and you're ready to go!
@@ -21,7 +21,7 @@ at the top of your current file and you're ready to go!
 You can generate the image above with the following code:
 
 ```js
-#import "../prooftree.typ": *
+#import "path/to/prooftree.typ": *
 
 #prooftree(
   axiom("A"),
