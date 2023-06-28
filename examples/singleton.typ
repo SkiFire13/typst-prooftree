@@ -1,12 +1,10 @@
-#import "../prooftree.typ": *
+#import "/prooftree.typ": *
 
-// This proof is so big it doesn't fit in a normal page => resize the page for it
 #show: content => style(styles => {
   let content = box(inset: 2em, content)
   let sizes = measure(content, styles)
   page(width: sizes.width, height: sizes.height, margin: 0pt, content)
 })
-
 #set text(font: "New Computer Modern", size: 12pt)
 
 #let N1 = $"N"_1$
