@@ -134,6 +134,7 @@
     __prooftree_raw: body,
     __prooftree_to_pop: 0,
     __prooftree_rule_func: (settings, styles, children) => {
+      let body = body
       if label != none {
         // Labels stack on top of axioms
         body = stack(
@@ -188,7 +189,7 @@
       if key not in ("left", "right") {
         panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
       }
-      if type(value) != "content" or type(value) != "string" {
+      if type(value) not in ("string", "content") {
         panic(
           "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
           + "` was expected to have type `string` or `content` but instead had type `" + type(value) + "`."
