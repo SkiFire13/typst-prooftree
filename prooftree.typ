@@ -1,6 +1,6 @@
 #let prooftree(
   spacing: (
-    horizontal: 1.5em,
+    horizontal: 1em,
     vertical: 0.5em,
     lateral: 0.5em,
   ),
@@ -134,7 +134,8 @@
     __prooftree_raw: body,
     __prooftree_to_pop: 0,
     __prooftree_rule_func: (settings, styles, children) => {
-      let body = body
+      let body = box(body, inset: (x: settings.spacing.lateral))
+      // let body = body
       if label != none {
         // Labels stack on top of axioms
         body = stack(

@@ -43,7 +43,7 @@ You can generate the image above with the following code:
 ```js
 let prooftree(
   spacing: (
-    horizontal: 1.5em,
+    horizontal: 1em,
     vertical: 0.5em,
     lateral: 0.5em,
   ),
@@ -59,7 +59,7 @@ The main function exported by this library is `prooftree`. If you're familiar wi
 Moreover this functions takes the following named arguments:
 
 - `spacing`: a dictionary of spacing related arguments, in particular:
-  - `horizontal` or `h`: `length`s that regulate the horizontal spacing between sibling rules (default: `1.5em`).
+  - `horizontal` or `h`: `length`s that regulate the horizontal spacing between sibling rules (default: `1em`).
   - `vertical` or `v`: `length`s that regulate the vertical spacing between the rules and the horizontal lines (default: `0.5em`);
   - `lateral` or `l`: `length`s that regulate the horizontal spacing on the sides of each rules (default: `0.5em`); the difference between this and `horizontal` is that this spacing enlarges the horizontal lines.
 - `label`: a dictionary of label related arguments, in particular:
