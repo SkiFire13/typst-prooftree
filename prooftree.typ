@@ -123,9 +123,9 @@
 #let axiom(label: none, body) = {
   // Check the type of `label`.
   assert(
-    type(label) == "string" or type(label) == "none",
+    type(label) in ("string", "content", "none"),
     message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
-     + "`string` but was instead `" + type(label) + "`."
+     + "`none`, `string` or `content` but was instead `" + type(label) + "`."
   )
 
   // TODO: allow the label to be aligned on left, right or center (default and current).
@@ -179,9 +179,9 @@
 
   // Check the type of `label`.
   assert(
-    type(label) in ("string", "dictionary", "none"),
+    type(label) in ("string", "dictionary", "content", "none"),
     message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
-     + "`string` or `dictionary` but was instead `" + type(label) + "`."
+     + "`none`, `string`, `content` or `dictionary` but was instead `" + type(label) + "`."
   )
   // If the type of `label` was string then it's good, otherwise we need to check its keys.
   if type(label) == "dictionary" {
