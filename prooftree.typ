@@ -292,7 +292,7 @@
           right: none
         )
       }
-      if type(label) == "string" {
+      if type(label) in ("string", "content") {
         label = (
           left: if settings.label.side == left { label } else { none },
           right: if settings.label.side == right { label } else { none }
