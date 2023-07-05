@@ -169,14 +169,6 @@
      + "`integer` but was instead `" + type(n) + "`."
   )
 
-  // TODO: maybe consider `rule(n: 0)` different from `axiom` and put a line on top?
-
-  // If `n` is 0 delegate to `axiom`. Note that this needs to be after checking the validity of `n`
-  // (because it is read) but before checking the validity of `label` (because `axiom` has its own validity rules).
-  if n == 0 {
-    return axiom(label: label, root)
-  }
-
   // Check the type of `label`.
   assert(
     type(label) in ("string", "dictionary", "content", "none"),
@@ -215,39 +207,30 @@
       
       let root = [ #h(settings.spacing.lateral) #root #h(settings.spacing.lateral) ]
 
-      // Axiom case
-      if n == 0 {
-        let body = if label != none {
-          // Labels stack on top of axioms
-          stack(
-            dir: ttb,
-            spacing: 1.5 * settings.spacing.vertical,
-            align(center, label),
-            root
-          )
-        } else {
-          root
-        }
-
-        return (
-          body: body,
-          label_wleft: 0pt,
-          label_wright: 0pt,
-          wleft: 0pt,
-          wright: 0pt,
-        )
+      // Get some values from the children, or 0pt if n == 0
+      let (
+        children_wleft,
+        children_label_wleft,
+        children_wright,
+        children_label_wright
+      ) = (0pt, 0pt, 0pt, 0pt)
+      if n != 0 {
+        children_wleft = children.first().wleft
+        children_label_wleft = children.first().label_wleft
+        children_wright = children.last().wright
+        children_label_wright = children.last().label_wright
       }
 
       // Map the children to a single block
       let branches = children.map(c => box(c.body)).join(h(settings.spacing.horizontal))
 
       // Calculate the offsets of the "inner" branches, i.e. ignoring branches' labels
-      let wbranches_nolabel = width(branches) - children.first().label_wleft - children.last().label_wright
+      let wbranches_nolabel = width(branches) - children_label_wleft - children_label_wright
       let ibranches_offset = maxl(0pt, width(root) - wbranches_nolabel) / 2
 
       // Compute the start, end and length of the line to satisfy the "inner" branches
-      let ib_line_start = ibranches_offset + children.first().wleft
-      let ib_line_end = ibranches_offset + wbranches_nolabel - children.last().wright
+      let ib_line_start = ibranches_offset + children_wleft
+      let ib_line_end = ibranches_offset + wbranches_nolabel - children_wright
       let ib_line_len = ib_line_end - ib_line_start
 
       // Pad the line length to satisfy the root too
@@ -270,8 +253,8 @@
       }
 
       // Finish computing the offsets by considering the ignored left branches label
-      let branches_offset = maxl(0pt, ibranches_offset - children.first().label_wleft)
-      let line_start = line_start + (branches_offset + children.first().label_wleft - ibranches_offset)
+      let branches_offset = maxl(0pt, ibranches_offset - children_label_wleft)
+      let line_start = line_start + (branches_offset + children_label_wleft - ibranches_offset)
       let root_offset = line_start + (line_len - width(root)) / 2
 
       // Compute body without the label.
@@ -341,11 +324,11 @@
 
       // Compute the final sizes for the next rule
       let label_wleft = minl(
-        new_left_space + branches_offset + children.first().label_wleft,
+        new_left_space + branches_offset + children_label_wleft,
         left_label_width_offset + width(left_label)
       )
       let label_wright = minl(
-        children.last().label_wright + (final_width - branches_offset - width(branches)),
+        children_label_wright + (final_width - branches_offset - width(branches)),
         final_width - right_label_width_offset
       )
       let wleft = (new_left_space + root_offset) - label_wleft
