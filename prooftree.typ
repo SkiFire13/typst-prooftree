@@ -15,12 +15,12 @@
   // Check the types of `spacing` and `label`.
   assert(
     type(spacing) == "dictionary",
-    message: "The value `" + repr(spacing) + "of the `spacing` argument was expected"
+    message: "The value `" + repr(spacing) + "` of the `spacing` argument was expected"
       + "to have type `dictionary` but instead had type `" + type(spacing) + "`."
   )
   assert(
     type(label) == "dictionary",
-    message: "The value `" + repr(label) + "of the `label` argument was expected"
+    message: "The value `" + repr(label) + "` of the `label` argument was expected"
       + "to have type `dictionary` but instead had type `" + type(label) + "`."
   )
 
