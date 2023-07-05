@@ -61,11 +61,13 @@
       )
     }
   }
-  assert(
-    "side" not in label or label.side == left or label.side == right,
-    message: "The value for the key `side` in the argument `label` can only be either "
-      + "`left` (default) or `right`, but instead was `" + repr(label.side) + "`."
-  )
+  if "side" in label {
+    assert(
+      label.side == left or label.side == right,
+      message: "The value for the key `side` in the argument `label` can only be either "
+        + "`left` (default) or `right`, but instead was `" + repr(label.side) + "`."
+    )
+  }
 
   // Check basic validity of `rules`.
   if rules.pos().len() == 0 {
