@@ -174,7 +174,7 @@
   // If `n` is 0 delegate to `axiom`. Note that this needs to be after checking the validity of `n`
   // (because it is read) but before checking the validity of `label` (because `axiom` has its own validity rules).
   if n == 0 {
-    return axiom(label, root)
+    return axiom(label: label, root)
   }
 
   // Check the type of `label`.
