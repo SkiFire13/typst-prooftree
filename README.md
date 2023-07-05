@@ -16,7 +16,7 @@ at the top of your current file and you're ready to go!
 
 # Example
 
-![Proof tree example](examples/example.jpg)
+![Proof tree example](examples/example.png)
 
 You can generate the image above with the following code:
 
