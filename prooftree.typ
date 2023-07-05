@@ -26,7 +26,7 @@
   )
   assert(
     type(line-stroke) == "length",
-    message: "The value `" + repr(line-stroke) + "of the `line-stroke` argument was expected"
+    message: "The value `" + repr(line-stroke) + "` of the `line-stroke` argument was expected"
       + "to have type `length` but instead had type `" + type(line-stroke) + "`."
 )
 
