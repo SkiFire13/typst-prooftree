@@ -267,7 +267,7 @@
         dir: ttb,
         spacing: settings.spacing.vertical,
         box(inset: (left: branches_offset), branches),
-        line(start: (line_start, 0pt), length: line_len),
+        line(start: (line_start, 0pt), length: line_len, stroke: 0.5pt),
         box(inset: (left: root_offset), root),
       )
 
