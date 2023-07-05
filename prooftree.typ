@@ -10,9 +10,10 @@
     side: left,
     padding: 0.2em,
   ),
+  line-stroke: 0.5pt,
   ..rules
 ) = {
-  // Check the types of `spacing` and `label`.
+  // Check the types of the parameters.
   assert(
     type(spacing) == "dictionary",
     message: "The value `" + repr(spacing) + "` of the `spacing` argument was expected"
@@ -23,6 +24,11 @@
     message: "The value `" + repr(label) + "` of the `label` argument was expected"
       + "to have type `dictionary` but instead had type `" + type(label) + "`."
   )
+  assert(
+    type(line-stroke) == "length",
+    message: "The value `" + repr(line-stroke) + "of the `line-stroke` argument was expected"
+      + "to have type `length` but instead had type `" + type(line-stroke) + "`."
+)
 
   // Check validity of `spacing`'s keys.
   for (key, value) in spacing {
@@ -86,6 +92,7 @@
       side: label.at("side", default: left),
       padding: label.at("padding", default: 0.2em),
     ),
+    line-stroke: 0.5pt,
   )
 
   // Draw the rules in a stack-based evaluation order. 
@@ -267,7 +274,7 @@
         dir: ttb,
         spacing: settings.spacing.vertical,
         box(inset: (left: branches_offset), branches),
-        line(start: (line_start, 0pt), length: line_len, stroke: 0.5pt),
+        line(start: (line_start, 0pt), length: line_len, stroke: settings.line-stroke),
         box(inset: (left: root_offset), root),
       )
 
