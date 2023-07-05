@@ -8,6 +8,7 @@
     // TODO: split offset into horizontal and vertical
     offset: -0.1em,
     side: left,
+    padding: 0.2em,
   ),
   ..rules
 ) = {
@@ -49,7 +50,7 @@
   mutually_exclusive("lateral", "l", spacing.keys())
   
   // Check validity of `label`'s keys.
-  let expected = ("offset": "length", "side": "alignment")
+  let expected = ("offset": "length", "side": "alignment", "padding": "length")
   for (key, value) in label {
     if key not in expected {
       panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
@@ -81,6 +82,7 @@
     label: (
       offset: label.at("offset", default: -0.1em),
       side: label.at("side", default: left),
+      padding: label.at("padding", default: 0.2em),
     ),
   )
 
@@ -304,8 +306,8 @@
       )
 
       // Pad the labels to separate them from the rule
-      let left_label = box(inset: (right: 0.2em), label.left)
-      let right_label = box(inset: (left: 0.2em), label.right)
+      let left_label = box(inset: (right: settings.label.padding), label.left)
+      let right_label = box(inset: (left: settings.label.padding), label.right)
 
       // Compute extra space the left label might need
       let new_left_space = maxl(0pt, width(left_label) - line_start)
