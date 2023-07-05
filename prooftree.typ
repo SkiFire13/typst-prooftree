@@ -92,7 +92,7 @@
       side: label.at("side", default: left),
       padding: label.at("padding", default: 0.2em),
     ),
-    line-stroke: 0.5pt,
+    line-stroke: line-stroke,
   )
 
   // Draw the rules in a stack-based evaluation order. 
