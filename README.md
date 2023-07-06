@@ -65,7 +65,7 @@ Moreover this functions takes the following named arguments:
   - `vertical` or `v`: `length`s that regulate the vertical spacing between the rules and the horizontal lines (default: `0.5em`);
   - `lateral` or `l`: `length`s that regulate the horizontal spacing on the sides of each rules (default: `0.5em`); the difference between this and `horizontal` is that this spacing enlarges the horizontal lines.
 - `label`: a dictionary of label related arguments, in particular:
-  - `side`: `alignment` that regulates the default side of labels on rules, but not axioms (default: `left`). Possible values are `left` and `right`.
+  - `side`: `alignment` that regulates the default side of labels on rules, but not axioms (default: `left`). Possible values are `left` and `right`;
   - `padding`: `length` that regulates the distance between the label and the rule (default: `0.2em`).
 - `line-stroke`: `length` that regulates the thickness of lines on rules (default: `0.5pt`).
 
