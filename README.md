@@ -49,7 +49,9 @@ let prooftree(
   ),
   label: (
     side: left,
+    padding: 0.2em,
   ),
+  line-stroke: 0.5pt,
   ..rules
 ) = /* ... */
 ```
@@ -64,6 +66,8 @@ Moreover this functions takes the following named arguments:
   - `lateral` or `l`: `length`s that regulate the horizontal spacing on the sides of each rules (default: `0.5em`); the difference between this and `horizontal` is that this spacing enlarges the horizontal lines.
 - `label`: a dictionary of label related arguments, in particular:
   - `side`: `alignment` that regulates the default side of labels on rules, but not axioms (default: `left`). Possible values are `left` and `right`.
+  - `padding`: `length` that regulates the distance between the label and the rule (default: `0.2em`).
+- `line-stroke`: `length` that regulates the thickness of lines on rules (default: `0.5pt`).
 
 ## `axiom`
 
@@ -86,4 +90,4 @@ let rule(n: 1, label: none, root) = /* ... */
 - `label`: a named argument representing the label(s) to show. It can be either:
   - `none`, in which case no label is shown;
   - a `string` or `content`, in which case a label is shown on the default side of the `prooftree`;
-  - a `dictionary` having `left` and/or `right` as keys, in which case the values associated to each key will be shown on the relative side. 
+  - a `dictionary` having `left` and/or `right` as keys, in which case the values associated to each key will be shown on the relative side.
