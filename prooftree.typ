@@ -12,158 +12,216 @@
   ),
   line-stroke: 0.5pt,
   ..rules
-) = {
-  // Check the types of the parameters.
-  assert(
-    type(spacing) == "dictionary",
-    message: "The value `" + repr(spacing) + "` of the `spacing` argument was expected"
-      + "to have type `dictionary` but instead had type `" + type(spacing) + "`."
-  )
-  assert(
-    type(label) == "dictionary",
-    message: "The value `" + repr(label) + "` of the `label` argument was expected"
-      + "to have type `dictionary` but instead had type `" + type(label) + "`."
-  )
-  assert(
-    type(line-stroke) == "length",
-    message: "The value `" + repr(line-stroke) + "` of the `line-stroke` argument was expected"
-      + "to have type `length` but instead had type `" + type(line-stroke) + "`."
-)
-
-  // Check validity of `spacing`'s keys.
-  for (key, value) in spacing {
-    if key not in ("horizontal", "vertical", "lateral", "h", "v", "l") {
-      panic("The key `" + key + "` in the `spacing` argument `" + repr(spacing) + "` was not expected.")
+) = context {
+  // Check parameters and compute normalized settings
+  let settings = {
+    // Check basic validity of `rules`.
+    if rules.pos().len() == 0 {
+      panic("The `rules` argument cannot be empty.")
     }
-    if type(value) != "length" {
-      panic(
-        "The value `" + repr(value) + "` of the key `" + key + "` in the `spacing` argument `" + repr(spacing)
-        + "` was expected to have type `length` but instead had type `" + type(value) + "`."
-      )
-    }
-  }
 
-  // Check exclusivity of `spacing`'s keys.
-  let mutually_exclusive(key1, key2, keys) = {
+
+    // Check the types of the parameters.
     assert(
-      key1 not in keys or key2 not in keys,
-      message: "The keys `" + key1 + "` and `" + key2 + "` in the `spacing` argument `"
-        + repr(spacing) + "` are mutually exclusive."
+      type(spacing) == "dictionary",
+      message: "The value `" + repr(spacing) + "` of the `spacing` argument was expected"
+        + "to have type `dictionary` but instead had type `" + type(spacing) + "`."
     )
-  }
-  mutually_exclusive("horizontal", "h", spacing.keys())
-  mutually_exclusive("vertical", "v", spacing.keys())
-  mutually_exclusive("lateral", "l", spacing.keys())
-  
-  // Check validity of `label`'s keys.
-  let expected = ("offset": "length", "side": "alignment", "padding": "length")
-  for (key, value) in label {
-    if key not in expected {
-      panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
-    }
-    if type(value) != expected.at(key) {
-      panic(
-        "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
-        + "` was expected to have type `" + type.at(key) + "` but instead had type `" + type(value) + "`."
-      )
-    }
-  }
-  if "side" in label {
     assert(
-      label.side == left or label.side == right,
-      message: "The value for the key `side` in the argument `label` can only be either "
-        + "`left` (default) or `right`, but instead was `" + repr(label.side) + "`."
+      type(label) == "dictionary",
+      message: "The value `" + repr(label) + "` of the `label` argument was expected"
+        + "to have type `dictionary` but instead had type `" + type(label) + "`."
     )
-  }
+    assert(
+      type(line-stroke) == "length",
+      message: "The value `" + repr(line-stroke) + "` of the `line-stroke` argument was expected"
+        + "to have type `length` but instead had type `" + type(line-stroke) + "`."
+    )
 
-  // Check basic validity of `rules`.
-  if rules.pos().len() == 0 {
-    panic("The `rules` argument cannot be empty.")
-  }
+    // Check validity of `spacing`'s keys.
+    for (key, value) in spacing {
+      if key not in ("horizontal", "vertical", "lateral", "h", "v", "l") {
+        panic("The key `" + key + "` in the `spacing` argument `" + repr(spacing) + "` was not expected.")
+      }
+      if type(value) != "length" {
+        panic(
+          "The value `" + repr(value) + "` of the key `" + key + "` in the `spacing` argument `" + repr(spacing)
+          + "` was expected to have type `length` but instead had type `" + type(value) + "`."
+        )
+      }
+    }
 
-  let settings = (
-    spacing: (
-      horizontal: spacing.at("horizontal", default: spacing.at("h", default: 1.5em)),
-      vertical: spacing.at("vertical", default: spacing.at("v", default: 0.5em)),
-      lateral: spacing.at("lateral", default: spacing.at("l", default: 0.5em)),
-    ),
-    label: (
-      offset: label.at("offset", default: -0.1em),
-      side: label.at("side", default: left),
-      padding: label.at("padding", default: 0.2em),
-    ),
-    line-stroke: line-stroke,
-  )
-
-  // Draw the rules in a stack-based evaluation order. 
-  style(styles => {
-    let stack = ()
-
-    for rule in rules.pos() {
-      let to_pop = rule.__prooftree_to_pop
-      let rule_func = rule.__prooftree_rule_func
-
+    // Check exclusivity of `spacing`'s keys.
+    let mutually_exclusive(key1, key2, keys) = {
       assert(
-        to_pop <= stack.len(),
-        message: "The rule `" + repr(rule.__prooftree_raw) + "` was expecting at least "
-          + str(to_pop) + " rules in the stack, but only " + str(stack.len()) + " were present."
+        key1 not in keys or key2 not in keys,
+        message: "The keys `" + key1 + "` and `" + key2 + "` in the `spacing` argument `"
+          + repr(spacing) + "` are mutually exclusive."
       )
-
-      let elem = rule_func(
-        settings,
-        styles,
-        stack.slice(stack.len() - to_pop)
+    }
+    mutually_exclusive("horizontal", "h", spacing.keys())
+    mutually_exclusive("vertical", "v", spacing.keys())
+    mutually_exclusive("lateral", "l", spacing.keys())
+    
+    // Check validity of `label`'s keys.
+    let expected = ("offset": "length", "side": "alignment", "padding": "length")
+    for (key, value) in label {
+      if key not in expected {
+        panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
+      }
+      if type(value) != expected.at(key) {
+        panic(
+          "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
+          + "` was expected to have type `" + type.at(key) + "` but instead had type `" + type(value) + "`."
+        )
+      }
+    }
+    if "side" in label {
+      assert(
+        label.side == left or label.side == right,
+        message: "The value for the key `side` in the argument `label` can only be either "
+          + "`left` (default) or `right`, but instead was `" + repr(label.side) + "`."
       )
-
-      stack = stack.slice(0, stack.len() - to_pop)
-      stack.push(elem)
     }
 
+    (
+      spacing: (
+        horizontal: spacing.at("horizontal", default: spacing.at("h", default: 1.5em)).to-absolute(),
+        vertical: spacing.at("vertical", default: spacing.at("v", default: 0.5em)).to-absolute(),
+        lateral: spacing.at("lateral", default: spacing.at("l", default: 0.5em)).to-absolute(),
+      ),
+      label: (
+        offset: label.at("offset", default: -0.1em).to-absolute(),
+        side: label.at("side", default: left),
+        padding: label.at("padding", default: 0.2em).to-absolute(),
+      ),
+      line-stroke: line-stroke.to-absolute(),
+    )
+  }
+
+  // Holds the current "pending" rules, i.e. those without a parent
+  let stack = ()
+  // Holds all the measures
+  let layouts = ()
+
+  // First pass: compute the layout of each rule given the one of its children
+  for (i, rule) in rules.pos().enumerate() {
+    let to_pop = rule.__prooftree_to_pop
+    let measure_func = rule.__prooftree_measure_func
+
     assert(
-      stack.len() == 1,
-      message: "Some rule remained unmatched: " + str(stack.len()) + " roots were found but only 1 was expected."
+      to_pop <= stack.len(),
+      message: "The rule `" + repr(rule.__prooftree_raw) + "` was expecting at least "
+        + str(to_pop) + " rules in the stack, but only " + str(stack.len()) + " were present."
     )
 
-    set align(start)
-    set box(inset: 0pt, outset: 0pt)
-    
-    stack.pop().body
-  })
+    // Remove the children from the stack
+    let children = stack.slice(stack.len() - to_pop)
+    stack = stack.slice(0, stack.len() - to_pop)
+
+    // Compute the layout and push
+    let layout = measure_func(i, settings, children)
+    stack.push(layout)
+    layouts.push(layout)
+  }
+
+  assert(
+    stack.len() == 1,
+    message: "Some rule remained unmatched: " + str(stack.len()) + " roots were found but only 1 was expected."
+  )
+
+  let last = stack.pop()
+
+  let content = {
+    let offsets = range(rules.pos().len()).map(_ => (0pt, 0pt))
+
+    // Second pass: backward draw each rule and compute offset of children
+    for (i, rule) in rules.pos().enumerate().rev() {
+      let (dx, dy) = offsets.at(i)
+      let layout = layouts.at(i)
+
+      // Update the offsets of the children
+      for (j, cdx, cdy) in layout.at("children_offsets", default: ()) {
+        offsets.at(j) = (dx + cdx, dy + cdy)
+      }
+
+      // Draw at the correct offset
+      let draw_func = rule.__prooftree_draw_func
+      place(left + bottom, dx: dx, dy: -dy, draw_func(settings, layout))
+    }
+  }
+
+  block(width: last.width, height: last.height, content)
 }
 
 #let axiom(label: none, body) = {
-  // Check the type of `label`.
-  assert(
-    type(label) in ("string", "content", "none"),
-    message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
-     + "`none`, `string` or `content` but was instead `" + type(label) + "`."
-  )
+  // Check arguments
+  {
+    // Check the type of `label`.
+    assert(
+      type(label) in ("string", "content", "none"),
+      message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
+      + "`none`, `string` or `content` but was instead `" + type(label) + "`."
+    )
+  }
 
   // TODO: allow the label to be aligned on left, right or center (default and current).
 
   (
     __prooftree_raw: body,
     __prooftree_to_pop: 0,
-    __prooftree_rule_func: (settings, styles, children) => {
-      let body = box(body, inset: (x: settings.spacing.lateral))
-      // let body = body
+    __prooftree_measure_func: (i, settings, children) => {
+      // Compute the size of the body
+      let body_size = measure(body)
+      let body_width = body_size.width.to-absolute()
+      let body_height = body_size.height.to-absolute()
+
+      // Compute width of the base (including space)
+      let base_width = body_width + 2 * settings.spacing.lateral
+
+      // Update layout if a label is present
+      let (width, height) = (base_width, body_height)
+      let base_side = 0pt
+      let (label_left, label_bottom) = (0pt, 0pt)
       if label != none {
-        // Labels stack on top of axioms
-        body = stack(
-          dir: ttb,
-          spacing: 1.5 * settings.spacing.vertical,
-          align(center, label),
-          body
-        )
+        // Compute the size of the label
+        let label_size = measure(label)
+        let label_width = label_size.width
+        let label_height = label_size.height
+        
+        // Update width and offsets from the left
+        width = calc.max(base_width, label_width)
+        base_side = (width - base_width) / 2
+        label_left = (width - label_width) / 2
+
+        // Compute bottom offset and update height
+        label_bottom = height + 1.5 * settings.spacing.vertical
+        height = label_bottom + label_height
       }
 
       return (
-        body: body,
-        label_wleft: 0pt,
-        label_wright: 0pt,
-        wleft: 0pt,
-        wright: 0pt,
+        index: i,
+        width: width,
+        height: height,
+        base_left: base_side,
+        base_right: base_side,
+        main_left: base_side,
+        main_right: base_side,
+
+        // Extra for draw
+        body_left: base_side + settings.spacing.lateral,
+        label_left: label_left,
+        label_bottom: label_bottom,
       )
+    },
+    __prooftree_draw_func: (settings, l) => {
+      // Draw body
+      place(left + bottom, dx: l.body_left, body)
+      
+      // Draw label
+      if label != none {
+        place(left + bottom, dx: l.label_left, dy: -l.label_bottom, label)
+      }
     }
   )
 }
@@ -173,31 +231,34 @@
   label: none,
   root
 ) = {
-  // Check validity of the `n` parameter
-  assert(
-    type(n) == "integer",
-    message: "The type of the `n` argument `" + repr(n) + "` was expected to be "
-     + "`integer` but was instead `" + type(n) + "`."
-  )
+  // Check arguments
+  {
+    // Check validity of the `n` parameter
+    assert(
+      type(n) == "integer",
+      message: "The type of the `n` argument `" + repr(n) + "` was expected to be "
+      + "`integer` but was instead `" + type(n) + "`."
+    )
 
-  // Check the type of `label`.
-  assert(
-    type(label) in ("string", "dictionary", "content", "none"),
-    message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
-     + "`none`, `string`, `content` or `dictionary` but was instead `" + type(label) + "`."
-  )
-  // If the type of `label` was string then it's good, otherwise we need to check its keys.
-  if type(label) == "dictionary" {
-    for (key, value) in label {
-      // TODO: maybe consider allowing `top`, `top-left` and `top-right` if `rule(n: 0)` gets changed.
-      if key not in ("left", "right") {
-        panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
-      }
-      if type(value) not in ("string", "content") {
-        panic(
-          "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
-          + "` was expected to have type `string` or `content` but instead had type `" + type(value) + "`."
-        )
+    // Check the type of `label`.
+    assert(
+      type(label) in ("string", "dictionary", "content", "none"),
+      message: "The type of the `label` argument `" + repr(label) + "` was expected to be "
+      + "`none`, `string`, `content` or `dictionary` but was instead `" + type(label) + "`."
+    )
+    // If the type of `label` was string then it's good, otherwise we need to check its keys.
+    if type(label) == "dictionary" {
+      for (key, value) in label {
+        // TODO: maybe consider allowing `top`, `top-left` and `top-right` if `rule(n: 0)` gets changed.
+        if key not in ("left", "right") {
+          panic("The key `" + key + "` in the `label` argument `" + repr(label) + "` was not expected.")
+        }
+        if type(value) not in ("string", "content") {
+          panic(
+            "The value `" + repr(value) + "` of the key `" + key + "` in the `label` argument `" + repr(label)
+            + "` was expected to have type `string` or `content` but instead had type `" + type(value) + "`."
+          )
+        }
       }
     }
   }
@@ -205,86 +266,13 @@
   (
     __prooftree_raw: root,
     __prooftree_to_pop: n,
-    __prooftree_rule_func: (settings, styles, children) => {
-      let width(it) = measure(it, styles).width
-      let height(it) = measure(it, styles).height
-      let maxl(..lengths) = width(
-        for length in lengths.pos() {
-          line(length: length)
-        }
-      )
-      let gtl(l1, l2) = maxl(l1, l2) != l2
-      let minl(l1, l2) = if gtl(l1, l2) { l2 } else { l1 }
-      
-      let root = [ #h(settings.spacing.lateral) #root #h(settings.spacing.lateral) ]
+    __prooftree_measure_func: (i, settings, children) => {
+      let width(it) = measure(it).width.to-absolute()
+      let height(it) = measure(it).height.to-absolute()
 
-      // Get some values from the children, or 0pt if n == 0
-      let (
-        children_wleft,
-        children_label_wleft,
-        children_wright,
-        children_label_wright
-      ) = (0pt, 0pt, 0pt, 0pt)
-      if n != 0 {
-        children_wleft = children.first().wleft
-        children_label_wleft = children.first().label_wleft
-        children_wright = children.last().wright
-        children_label_wright = children.last().label_wright
-      }
-
-      // Map the children to a single block
-      let branches = children.map(c => box(c.body)).join(h(settings.spacing.horizontal))
-
-      // Calculate the offsets of the "inner" branches, i.e. ignoring branches' labels
-      let wbranches_nolabel = width(branches) - children_label_wleft - children_label_wright
-      let ibranches_offset = maxl(0pt, width(root) - wbranches_nolabel) / 2
-
-      // Compute the start, end and length of the line to satisfy the "inner" branches
-      let ib_line_start = ibranches_offset + children_wleft
-      let ib_line_end = ibranches_offset + wbranches_nolabel - children_wright
-      let ib_line_len = ib_line_end - ib_line_start
-
-      // Pad the line length to satisfy the root too
-      let line_len = maxl(ib_line_len, width(root))
-
-      // Adjust the line start to account for the root padding
-      let line_start = if gtl(ib_line_len, width(root)) {
-        // No root padding
-        ib_line_start
-      } else if gtl(width(root), wbranches_nolabel) {
-        // The "inner" branches are too tight
-        0pt
-      } else {
-        // Weird, situation, we have `wbranches_nolabel > width(root) > ib_line_len`
-        // The line should be adjusted so that it fits kinda in the middle
-        // TODO: maybe this should also consider labels?
-        let min_left = maxl(0pt, ib_line_end - line_len)
-        let max_right = minl(maxl(wbranches_nolabel, width(root)), ib_line_start + line_len)
-        (max_right + min_left) / 2 - line_len / 2
-      }
-
-      // Finish computing the offsets by considering the ignored left branches label
-      let branches_offset = maxl(0pt, ibranches_offset - children_label_wleft)
-      let line_start = line_start + (branches_offset + children_label_wleft - ibranches_offset)
-      let root_offset = line_start + (line_len - width(root)) / 2
-
-      // Compute body without the label.
-      // This is needed later to calculate the sizes when placing the new labels.
-      let body_nolabel = stack(
-        dir: ttb,
-        spacing: settings.spacing.vertical,
-        box(inset: (left: branches_offset), branches),
-        line(start: (line_start, 0pt), length: line_len, stroke: settings.line-stroke),
-        box(inset: (left: root_offset), root),
-      )
-
-      // Normalize label given the default value in the `prooftree` function.
       let label = label
       if type(label) == "none" {
-        label = (
-          left: none,
-          right: none
-        )
+        label = (left: none, right: none)
       }
       if type(label) in ("string", "content") {
         label = (
@@ -297,61 +285,121 @@
         right: label.at("right", default: none),
       )
 
-      // Pad the labels to separate them from the rule
-      let left_label = box(inset: (right: settings.label.padding), label.left)
-      let right_label = box(inset: (left: settings.label.padding), label.right)
+      // Size of root
+      let root_width = width(root)
+      let root_height = height(root)
 
-      // Compute extra space the left label might need
-      let new_left_space = maxl(0pt, width(left_label) - line_start)
-      let left_label_width_offset = maxl(0pt, line_start - width(left_label))
+      // Width of base, which includes spacing as well
+      let base_width = 2 * settings.spacing.lateral + root_width
 
-      // Compute the width offset of the right label
-      let right_label_width_offset = new_left_space + line_start + line_len
+      // Bottom offset of the line and children
+      let line_bottom = root_height + settings.spacing.vertical
+      let children_bottom = line_bottom + settings.spacing.vertical
 
-      // Compute the final width
-      let final_width = maxl(
-        right_label_width_offset + width(right_label), 
-        new_left_space + width(body_nolabel)
-      )
+      // Left/right offset of bases of extreme children
+      let (child_base_left, child_base_right) = (0pt, 0pt)
+      if n != 0 {
+        child_base_left = children.first().base_left
+        child_base_right = children.last().base_right
+      }
 
-      // Place the label on top of the rest.
-      // Note that this needs to fix the final dimensions in order to use `place`.
-      let body = box(width: final_width, height: height(body_nolabel))[
-        #set block(spacing: 0pt)
-        #box(inset: (left: new_left_space), body_nolabel)
-        #place(
-          bottom + left,
-          dx: left_label_width_offset,
-          dy: settings.label.offset,
-          box(height: 2 * (height(root) + settings.spacing.vertical), align(horizon, left_label))
-        )
-        #place(
-          bottom + left,
-          dx: right_label_width_offset,
-          dy: settings.label.offset,
-          box(height: 2 * (height(root) + settings.spacing.vertical), align(horizon, right_label))
-        )
-      ]
+      // Width and height of children, and width of their combined bases
+      let children_width = children
+        .map(c => c.width)
+        .intersperse(settings.spacing.horizontal)
+        .sum()
+      let children_height = children.map(c => c.height).fold(0pt, calc.max)
+      let children_base_width = children_width - child_base_left - child_base_right
 
-      // Compute the final sizes for the next rule
-      let label_wleft = minl(
-        new_left_space + branches_offset + children_label_wleft,
-        left_label_width_offset + width(left_label)
-      )
-      let label_wright = minl(
-        children_label_wright + (final_width - branches_offset - width(branches)),
-        final_width - right_label_width_offset
-      )
-      let wleft = (new_left_space + root_offset) - label_wleft
-      let wright = width(body) - new_left_space - root_offset - width(root) - label_wright
+      // Width of the line
+      let line_width = calc.max(children_base_width, base_width)
+      
+      // Left/right offsets of lateral children main
+      let (child_main_left, child_main_right) = (0pt, 0pt)
+      if n != 0 {
+        child_main_left = children.first().main_left
+        child_main_right = children.last().main_right
+      }
+
+      // Offset of bases from line start (same for left/right)
+      let base_from_line = (line_width - base_width) / 2
+      let children_base_from_line = (line_width - children_base_width) / 2
+
+      // Space for labels
+      let (label_left_width, label_right_width) = (0pt, 0pt)
+      let (label_left_height, label_right_height) = (0pt, 0pt)
+      if label.left != none {
+        label_left_width = width(label.left) + settings.label.padding
+        label_left_height = height(label.left)
+      }
+      if label.right != none {
+        label_right_width = width(label.right) + settings.label.padding
+        label_right_height = height(label.right)
+      }
+
+      // Left/right offsets of line = max of labels and children main
+      let line_left = calc.max(label_left_width, child_base_left - children_base_from_line)
+      let line_right = calc.max(label_right_width, child_base_right - children_base_from_line)
+
+      // Left/right offsets of base
+      let base_left = line_left + base_from_line
+      let base_right = line_right + base_from_line
+
+      // Left/right offsets of children
+      let children_left = line_left + children_base_from_line - child_base_left
+      let children_right = line_right + children_base_from_line - child_base_right
+
+      // Left/right offsets of main
+      let main_left = calc.min(line_left, children_left + child_main_left)
+      let main_right = calc.min(line_right, children_right + child_main_right)
+
+      // Full width and height
+      let width = line_left + line_width + line_right
+      let height = children_bottom + children_height
+
+      // Incrementally compute the relative offset of each child
+      let children_offsets = ()
+      for c in children {
+        children_offsets.push((c.index, children_left, children_bottom))
+        children_left += c.width + settings.spacing.horizontal
+      }
 
       (
-        body: body,
-        label_wleft: label_wleft,
-        label_wright: label_wright,
-        wleft: wleft,
-        wright: wright,
+        index: i,
+        width: width,
+        height: height,
+        base_left: base_left,
+        base_right: base_right,
+        main_left: main_left,
+        main_right: main_right,
+        children_offsets: children_offsets,
+
+        // Extra for draw
+        label: label,
+        root_left: base_left + settings.spacing.lateral,
+        line_left: line_left,
+        line_bottom: line_bottom,
+        line_width: line_width,
+        label_left: line_left - label_left_width,
+        label_right: line_right - label_right_width,
+        label_left_bottom: root_height + settings.spacing.vertical + settings.line-stroke / 2 - label_left_height / 2 - settings.label.offset,
+        label_right_bottom: root_height + settings.spacing.vertical + settings.line-stroke / 2 - label_right_height / 2 - settings.label.offset,
       )
+    },
+    __prooftree_draw_func: (settings, l) => {
+      // Draw root content
+      place(left + bottom, dx: l.root_left, root)
+      
+      // Draw line
+      place(left + bottom, dx: l.line_left, dy: -l.line_bottom, line(length: l.line_width, stroke: settings.line-stroke))
+
+      // Draw labels
+      if l.label.left != none {
+        place(left + bottom, dx: l.label_left, dy: -l.label_left_bottom, l.label.left)
+      }
+      if l.label.right != none {
+        place(left + bottom, dx: l.label_right, dy: -l.label_right_bottom, l.label.right)
+      }
     }
   )
 }
