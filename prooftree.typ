@@ -381,7 +381,7 @@
         line_bottom: line_bottom,
         line_width: line_width,
         label_left: line_left - label_left_width,
-        label_right: line_right - label_right_width,
+        label_right: line_left + line_width + settings.label.padding,
         label_left_bottom: root_height + settings.spacing.vertical + settings.line-stroke / 2 - label_left_height / 2 - settings.label.offset,
         label_right_bottom: root_height + settings.spacing.vertical + settings.line-stroke / 2 - label_right_height / 2 - settings.label.offset,
       )
